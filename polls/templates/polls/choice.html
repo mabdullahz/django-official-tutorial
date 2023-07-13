@@ -1,0 +1,9 @@
+<form action="{% url 'polls:choice' question.id %}" method="post">
+    {% csrf_token %}
+    <h1>You are adding a choice for: "{{ question.question_text }}"</h1>
+    {% if error_message %}<p style="color: red"><strong>{{ error_message }}</strong></p>{% endif %}
+    <label for="choice">Enter your choice: </label>
+    <input type="text" value="" name="choice">
+    <input type="submit" value="Add" id="choice">
+</form>
+
