@@ -1,0 +1,7 @@
+li a {
+    color: red;
+}
+
+body {
+    background: aquamarine url("images/pattern.jpeg") repeat fixed center;
+}
