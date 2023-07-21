@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block page_body %}
+    {% include "polls/includes/header.html" %}
     <form action="{% url 'polls:vote' question.id %}" method="post">
         {% csrf_token %}
         <fieldset>
