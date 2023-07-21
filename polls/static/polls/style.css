@@ -3,5 +3,8 @@ li a {
 }
 
 body {
-    background: aquamarine url("images/pattern.jpeg") repeat fixed center;
+    background: linear-gradient(45deg,transparent 34%, #e5e5e5 35%, #e5e5e5 40%, transparent 41%, transparent 59%, #e5e5e5  60%, #e5e5e5 65%, transparent 66%),linear-gradient(135deg,transparent 34%, #e5e5e5 35%, #e5e5e5 40%, transparent 41%, transparent 59%, #e5e5e5  60%, #e5e5e5 65%, transparent 66%), radial-gradient(#e5e5e5 10%, transparent 11%), radial-gradient(circle at left,#e5e5e5 5%, transparent 6%), radial-gradient(circle at right,#e5e5e5 5%, transparent 6%), radial-gradient(circle at top,#e5e5e5 5%, transparent 6%), radial-gradient(circle at bottom,#e5e5e5 5%, transparent 6%);
+    background-size: 3em 3em;
+    background-color: #ffffff;
+    opacity: 1
 }

@@ -1,3 +1,10 @@
 <header>
-    <nav><a href="{% url 'polls:index' %}"> Polls App </a></nav>
+    <nav style='display: flex; justify-content: space-between;'>
+        <a href="{% url 'polls:home' %}"> Polls App </a>
+        {% if user.is_authenticated %}
+        <span style="">
+            <a href="{% url 'polls:logout' %}"> Logout </a> 
+        </span>
+        {% endif %}
+    </nav>
 </header>

@@ -10,24 +10,37 @@ from django.shortcuts import get_object_or_404, render
 
 from .models import Question, Choice
 
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, logout, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class IndexView(generic.ListView):
-    template_name = "polls/index.html"
+
+def index(request):
+    return render(request, "polls/index.html", {})
+
+
+class HomeView(LoginRequiredMixin, generic.ListView):
+    login_url = "/polls"
+    template_name = "polls/home.html"
     context_object_name = "question_list"
 
     def get_queryset(self):
         """Return the last five published questions."""
         return Question.objects.order_by("-pub_date")[:5]
 
-class DetailView(generic.DetailView):
+class DetailView(LoginRequiredMixin, generic.DetailView):
+    login_url = "/polls"
     model = Question
     template_name = "polls/detail.html"
 
 
-class ResultsView(generic.DetailView):
+class ResultsView(LoginRequiredMixin, generic.DetailView):
+    login_url = "/polls"
     model = Question
     template_name = "polls/results.html"
 
+@login_required(login_url="/polls")
 def choice(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
 
@@ -48,7 +61,7 @@ def choice(request, question_id):
         new_choice.save()
         return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
 
-
+@login_required(login_url="/polls")
 def vote_reset(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
 
@@ -58,7 +71,7 @@ def vote_reset(request, question_id):
 
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
-
+@login_required(login_url="/polls")
 def add_question(request):
     if request.method == 'GET':
         return render(request, "polls/new_question.html", {})
@@ -74,8 +87,9 @@ def add_question(request):
             pub_date=timezone.now(),
         )
         new_question.save()
-    return HttpResponseRedirect(reverse("polls:index",))
+    return HttpResponseRedirect(reverse("polls:home",))
 
+@login_required(login_url="/polls")
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     try:
@@ -97,3 +111,40 @@ def vote(request, question_id):
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+
+
+def login_user(request):
+    data = request.POST
+    user = authenticate(request, username=data['username'], password=data['password'])
+
+    if user is not None:
+        login(request, user)
+        return HttpResponseRedirect(reverse("polls:home"))
+    else:
+        return render(request, "polls/index.html", {
+            "login_message": "Wrong username/password",
+        })
+
+
+@login_required(login_url="/polls")
+def logout_user(request):
+    logout(request)
+    return render(request, "polls/index.html", {
+        "login_message": "Successfully logged out!",
+    })
+
+def register(request):
+    data = request.POST
+    u = User.objects.create_user(
+        username=data['username'],
+        email=data['email'],
+        password=data['password'],
+        first_name=data['fname'],
+        last_name=data['lname'],
+    )
+
+    u.save()
+
+    return render(request, "polls/index.html", {
+        "register_message": "Successfully registered, please login using your email/password now",
+    })

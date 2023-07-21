@@ -7,23 +7,36 @@
 {% endblock %}
 
 {% block page_title %}
-    Polls Index
+    Welcome to the Polls App!
 {% endblock %}
 
 {% block page_body %}
     {% include "polls/includes/header.html" %}
-    {% if question_list %}
-        <ul>
-        {% for question in question_list %}
-            <li title="{{ question.question_text }}">
-                <a href="{% url 'polls:detail' question.id %}">
-                    {{ question.question_text|truncatechars:20 }}
-                </a>
-            </li>
-        {% endfor %}
-        </ul>
-        <a href="{% url 'polls:new' %}"> Add question </a>
-    {% else %}
-        <p>No polls are available.</p>
-    {% endif %}
+    <h1> Login </h1>
+    <form action="{% url 'polls:login' %}" method="post">
+        {% csrf_token %}
+        {% if login_message %}<p style="color: red"><strong>{{ login_message }}</strong></p>{% endif %}
+        <label for="username">Username: </label>
+        <input type="text" value="" name="username"> <br/><br/>
+        <label for="email">Password: </label>
+        <input type="password" value="" name="password"> <br/><br/>
+        <input type="submit" value="Login" id="login">
+    </form>
+
+    <h1> Register </h1>
+    <form action="{% url 'polls:register' %}" method="post">
+        {% csrf_token %}
+        {% if register_message %}<p style="color: red"><strong>{{ register_message }}</strong></p>{% endif %}
+        <label for="fname">First name: </label>
+        <input type="text" value="" name="fname"> <br/><br/>
+        <label for="lname">Last Name: </label>
+        <input type="text" value="" name="lname"> <br/><br/>
+        <label for="email">Email: </label>
+        <input type="email" value="" name="email"> <br/><br/>
+        <label for="username">Username: </label>
+        <input type="text" value="" name="username"> <br/><br/>
+        <label for="password">Password: </label>
+        <input type="password" value="" name="password"> <br/><br/>
+        <input type="submit" value="Register" id="register">
+    </form>
 {% endblock %}
