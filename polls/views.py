@@ -16,6 +16,21 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+
+def send_to_lobby(msg):
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        'chat_lobby',
+        {
+            "type": "chat.message",
+            'message': msg,
+        }
+    )
+
 def index(request):
     return render(request, "polls/index.html", {})
 
@@ -59,6 +74,7 @@ def choice(request, question_id):
             choice_text=user_submitted_choice,
         )
         new_choice.save()
+        send_to_lobby(f'<i>{request.user.username}</i> added a new choice to the question <a href="{reverse("polls:detail", args=(question.id,))}">"{question.question_text}"</a>')
         return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
 
 @login_required(login_url="/polls")
@@ -69,6 +85,7 @@ def vote_reset(request, question_id):
         choice.votes = 0
         choice.save()
 
+    send_to_lobby(f'<i>{request.user.username}</i> reset the votes for question <a href="{reverse("polls:detail", args=(question.id,))}">"{question.question_text}"</a>')
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
 @login_required(login_url="/polls")
@@ -87,6 +104,7 @@ def add_question(request):
             pub_date=timezone.now(),
         )
         new_question.save()
+        send_to_lobby(f'<i>{request.user.username}</i> just added a new question <a href="{reverse("polls:detail", args=(new_question.id,))}">"{new_question.question_text}"</a>')
     return HttpResponseRedirect(reverse("polls:home",))
 
 @login_required(login_url="/polls")
@@ -107,6 +125,7 @@ def vote(request, question_id):
     else:
         selected_choice.votes += 1
         selected_choice.save()
+        send_to_lobby(f'<i>{request.user.username}</i> just vote on <a href="{reverse("polls:detail", args=(question.id,))}">"{question.question_text}"</a>')
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
@@ -119,6 +138,7 @@ def login_user(request):
 
     if user is not None:
         login(request, user)
+        send_to_lobby(f'<i>{request.user.username}</i> just logged in!')
         return HttpResponseRedirect(reverse("polls:home"))
     else:
         return render(request, "polls/index.html", {
@@ -128,7 +148,9 @@ def login_user(request):
 
 @login_required(login_url="/polls")
 def logout_user(request):
+    username = request.user.username
     logout(request)
+    send_to_lobby(f'<i>{username}</i> just logged out!')
     return render(request, "polls/index.html", {
         "login_message": "Successfully logged out!",
     })
@@ -144,6 +166,7 @@ def register(request):
     )
 
     u.save()
+    send_to_lobby(f'<i>{data["username"]}</i> just registered for a new account!')
 
     return render(request, "polls/index.html", {
         "register_message": "Successfully registered, please login using your email/password now",
