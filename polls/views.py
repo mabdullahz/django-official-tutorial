@@ -6,7 +6,7 @@ from django.views import generic
 
 from django.utils import timezone
 
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 
 from .models import Question, Choice
 
@@ -32,6 +32,8 @@ def send_to_lobby(msg):
     )
 
 def index(request):
+    if request.user.is_authenticated:
+        return redirect("/polls/home")
     return render(request, "polls/index.html", {})
 
 
@@ -151,9 +153,7 @@ def logout_user(request):
     username = request.user.username
     logout(request)
     send_to_lobby(f'<i>{username}</i> just logged out!')
-    return render(request, "polls/index.html", {
-        "login_message": "Successfully logged out!",
-    })
+    return HttpResponseRedirect(reverse("polls:index"))
 
 def register(request):
     data = request.POST
