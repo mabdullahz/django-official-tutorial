@@ -20,4 +20,5 @@ urlpatterns = [
     path("<int:question_id>/vote_reset/", views.vote_reset, name="vote_reset"),
     # ex: /polls/new/
     path("new/", views.add_question, name="new"),
+    path("choices/", views.all_choices, name="all_choices"),
 ]

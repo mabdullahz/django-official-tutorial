@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.template import loader
 from django.urls import reverse
 from django.views import generic
+from django.core.paginator import Paginator
 
 from django.utils import timezone
 
@@ -39,12 +40,13 @@ def index(request):
 
 class HomeView(LoginRequiredMixin, generic.ListView):
     login_url = "/polls"
+    paginate_by = 4
     template_name = "polls/home.html"
     context_object_name = "question_list"
 
     def get_queryset(self):
         """Return the last five published questions."""
-        return Question.objects.order_by("-pub_date")[:5]
+        return Question.objects.order_by("-pub_date")
 
 class DetailView(LoginRequiredMixin, generic.DetailView):
     login_url = "/polls"
@@ -171,3 +173,13 @@ def register(request):
     return render(request, "polls/index.html", {
         "register_message": "Successfully registered, please login using your email/password now",
     })
+
+
+def all_choices(request):
+    choice_list = Choice.objects.all()
+
+    paginator = Paginator(choice_list, 10)
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    return render(request, "polls/choice_list.html", {"page_obj": page_obj})

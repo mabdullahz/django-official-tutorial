@@ -22,8 +22,10 @@
             </li>
         {% endfor %}
         </ul>
-        <a href="{% url 'polls:new' %}"> Add question </a>
+        <a href="{% url 'polls:new' %}"> Add question </a> <br />
+        <a href="{% url 'polls:all_choices' %}"> All choices </a>
     {% else %}
         <p>No polls are available.</p>
     {% endif %}
+    {% include "polls/includes/paginator.html" %}
 {% endblock %}
