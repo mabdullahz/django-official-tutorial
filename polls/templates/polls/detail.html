@@ -15,6 +15,9 @@
         {% csrf_token %}
         <fieldset>
             <legend><h1>{{ question.question_text }}</h1></legend>
+            {% if question.image %}
+                <img src={{ question.image.url }} /> <br />
+            {% endif %}
             {% if error_message %}<p style="color: red"><strong>{{ error_message }}</strong></p>{% endif %}
             {% for choice in question.choice_set.all %}
                 <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
